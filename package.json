@@ -100,14 +100,17 @@
 		"tslint-config-prettier": "^1.14.0",
 		"tslint-config-standard": "^7.1.0",
 		"typedoc": "^0.17.8",
-		"validate-commit-msg": "^2.12.2"
+		"validate-commit-msg": "^2.12.2",
+		"typescript": "^3.8.3"
 	},
 	"dependencies": {
 		"@zerollup/ts-helpers": "^1.7.18",
 		"fs": "0.0.1-security",
 		"path": "^0.12.7",
 		"plantuml-parser": "0.0.16",
-		"typescript": "^3.8.3",
 		"walk-sync": "^2.2.0"
+	},
+	"peerDependencies": {
+		"typescript": "^3.8.3 || ^4.0.0"
 	}
 }
