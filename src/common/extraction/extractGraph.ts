@@ -7,6 +7,7 @@ import { Edge } from "./graph"
 import { TechnicalError } from "../error/errors"
 import { normalizeWindowsPaths } from "../util/pathUtils"
 import { ImportPathsResolver } from "@zerollup/ts-helpers"
+import { guessLocationOfTsconfig } from "../typescript/guessLocationOfTsconfig"
 
 async function guessProjectFiles(globPattern: string): Promise<string[]> {
 	return new Promise<string[]>((resolve, reject) => {
@@ -18,26 +19,6 @@ async function guessProjectFiles(globPattern: string): Promise<string[]> {
 			resolve(files)
 		})
 	})
-}
-
-// TODO write exception code free everywhere
-export function guessLocationOfTsconfig(): string | undefined {
-	return guessLocationOfTsconfigRecursively(".")
-}
-
-function guessLocationOfTsconfigRecursively(pathName: string): string | undefined {
-	const dir = fs.readdirSync(pathName)
-	for (const fileName of dir) {
-		if (path.basename(fileName) === "tsconfig.json") {
-			return path.resolve(pathName, "tsconfig.json")
-		}
-	}
-	const levelUp = path.resolve(pathName, "..")
-	if (path.relative(levelUp, pathName) === pathName) {
-		return undefined
-	} else {
-		return guessLocationOfTsconfigRecursively(levelUp)
-	}
 }
 
 const graphCache: Map<string | undefined, Promise<Edge[]>> = new Map()
@@ -54,11 +35,9 @@ export async function extractGraph(configFileName?: string): Promise<Edge[]> {
 }
 
 // TODO - distinguish between different import kinds (types, function etc.)
-export async function extractGraphUncached(configFileName?: string): Promise<Edge[]> {
-	let configFile = configFileName
-	if (configFile === undefined) {
-		configFile = guessLocationOfTsconfig()
-	}
+export async function extractGraphUncached(
+	configFile: string | undefined = guessLocationOfTsconfig()
+): Promise<Edge[]> {
 	if (configFile === undefined) {
 		throw new TechnicalError("Could not find configuration path")
 	}
